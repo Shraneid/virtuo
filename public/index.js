@@ -161,3 +161,164 @@ const actors = [{
 console.log(cars);
 console.log(rentals);
 console.log(actors);
+
+
+//EXERCICE 1
+let car;
+let Difference_In_Time;
+let Difference_In_Days;
+let dateA;
+let dateB;
+let timeC;
+let distC;
+let price;
+
+function getRentalWPrices(){
+  let rentalWPrices = []
+
+  for (let i = 0; i < rentals.length; i++){
+    let rental = rentals[i];
+    for (let j = 0; j < cars.length; j++){
+      let tempcar = cars[j];
+      if (tempcar.id == rental.carId){
+        car = tempcar;
+        break;
+      }
+    }
+    let temprental = {...rental};
+
+    dateA = new Date(rental.pickupDate);
+    dateB = new Date(rental.returnDate);
+    Difference_In_Time = dateB.getTime() - dateA.getTime(); 
+    Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24) + 1;
+
+    temprental.days = Difference_In_Days;
+    
+    timeC = Difference_In_Days * car.pricePerDay;
+
+    distC = rental.distance * car.pricePerKm;
+
+    price = timeC + distC;
+    temprental.price = price;
+
+    rentalWPrices.push(temprental);
+  }
+  return rentalWPrices;
+}
+
+let rentalWPrices = getRentalWPrices();
+console.log("Exercice 1");
+console.log(rentalWPrices);
+
+
+
+//EXERCICE 2
+function getRentalWPRicesWReductions(rentals){
+  let finalRentals = [];
+  let temprental;
+  for (let i = 0; i < rentals.length; i++){
+    temprental = {...rentals[i]};
+  
+    if (temprental.days > 10){
+      temprental.price *= 0.5;
+    } else if (temprental.days > 4){
+      temprental.price *= 0.7;
+    } else if (temprental.days > 1){
+      temprental.price *= 0.9;
+    }
+
+    finalRentals.push(temprental);
+  }
+
+  return finalRentals;
+}
+
+let rentalWPRicesWReductions = getRentalWPRicesWReductions(rentalWPrices);
+console.log("Exercice 2");
+console.log(rentalWPRicesWReductions);
+
+
+//EXERCICE 3
+function getCommission(rentals){
+  let finalRentals = [];
+
+  let temprental;
+  for (let i = 0; i < rentals.length; i++){
+    temprental = {...rentals[i]};
+  
+    let totalCom = temprental.price * 0.3;
+    let insurance = totalCom * 0.5;
+    let treasury = temprental.days;
+    let virtuo = totalCom - insurance - treasury;
+
+    let commission = {
+      "insurance": insurance,
+      "treasury": treasury,
+      "virtuo": virtuo 
+    };
+
+    temprental.commission = commission;
+
+    finalRentals.push(temprental);
+  }
+
+  return finalRentals;
+}
+
+
+let rentalWCommission = getCommission(rentalWPRicesWReductions);
+console.log("Exercice 3");
+console.log(rentalWCommission);
+
+
+
+//EXERCICE 4
+
+function getDeductible(rentals){
+  let finalRentals = [];
+
+  let temprental;
+  for (let i = 0; i < rentals.length; i++){
+    temprental = {...rentals[i]};
+  
+    if (temprental.options.deductibleReduction){
+      temprental.price += 4 * temprental.days;
+    }
+
+    finalRentals.push(temprental);
+  }
+  return finalRentals;
+}
+
+
+let rentalsWDeductible = getDeductible(rentalWCommission);
+console.log("Exercice 4");
+console.log(rentalsWDeductible);
+
+
+
+//EXERCICE 5
+
+function getActors(actors, rentals){
+  let finalActors = [];
+
+  let temprental;
+  for (let i = 0; i < actors.length; i++){
+    temprental = {...actors[i]};
+
+    temprental.payment[0].amount = rentals[i].price;
+    temprental.payment[1].amount = rentals[i].price - (rentals[i].commission.insurance + rentals[i].commission.treasury + rentals[i].commission.virtuo);
+    temprental.payment[2].amount = rentals[i].commission.insurance;
+    temprental.payment[3].amount = rentals[i].commission.treasury;
+    temprental.payment[4].amount = rentals[i].commission.virtuo;
+
+    finalActors.push(temprental);
+  }
+  return finalActors;
+}
+
+
+let newActors = getActors(actors, rentalsWDeductible );
+console.log("Exercice 5");
+console.log(newActors);
+
